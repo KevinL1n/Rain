@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>canvas雨滴特效</title>
+		<style type="text/css">
+			*{margin: 0;}
+			#rain{
+				background-color: #000000;
+				display: block;
+			}
+			iframe{display: none;}
+		</style>
+	</head>
+	<body>
+		<canvas id="rain" width="" height="">浏览器不支持HTML5</canvas>
+		<audio autoplay="autoplay" loop="loop" src="//music.163.com/outchain/player?type=3&id=902208959&auto=1&height=66//music.163.com/outchain/player?type=3&id=902208959&auto=1&height=66"></audio>  
+	</body>
+	<script type="text/javascript">
+		var canvas=document.getElementById("rain");
+		var can=canvas.getContext("2d");
+		var w=window.innerWidth;
+		var h=window.innerHeight;
+		canvas.width=w;
+		canvas.height=h;
+		window.onresize=function(){
+		w=window.innerWidth;
+		h=window.innerHeight;
+		canvas.width=w;
+		canvas.height=h;	
+		}
+		
+		function random(min,max){
+			return Math.random()*(max-min)+min;
+		}
+		
+		function Rain(){};
+		Rain.prototype={
+			init:function(){
+				this.x=random(0,w);
+				this.y=0;
+				this.v=random(4,6);
+				this.h=random(0.8*h,0.95*h);
+				
+				this.r=1;
+				this.vr=random(1,2);
+				this.a=1;
+				this.va=0.96;
+				
+			},
+			draw:function(){
+				if(this.y<this.h){
+					can.fillStyle="rgb(0,255,255)";
+				    can.fillRect(this.x,this.y,2,10);
+				}else{
+					can.strokeStyle="rgba(0,255,255,"+this.a+")";
+					can.beginPath();
+					can.arc(this.x,this.y,this.r,0,Math.PI*2);
+					can.stroke();
+				}
+				
+			},
+			move:function(){
+				if(this.y<this.h){
+					this.y+=this.v;
+				}else{
+					if(this.a>0.05){
+						this.r+=this.vr;
+						if(this.r>50){
+							this.a*=this.va;
+						}
+					}else{
+						this.init();
+					}
+					
+				}
+				this.draw();
+				
+			}
+			
+		}
+		var Arr=[];
+		function creatRain(){
+			var rain=new Rain();
+			rain.init();
+			rain.draw();
+			Arr.push(rain);
+		}
+		for(var i=0;i<20;i++){
+			setTimeout(creatRain,200*i);
+		}
+		
+		function moveRain(){
+			can.fillStyle="rgba(0,0,0,0.05)";
+			can.fillRect(0,0,w,h);
+			for(var k=0;k<Arr.length;k++){
+				Arr[k].move();	
+			}
+		}
+		
+		function run(){
+			moveRain();
+			setTimeout(run,1000/60);
+		}
+		run();
+	</script>
+</html>
